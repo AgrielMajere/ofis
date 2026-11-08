@@ -115,6 +115,20 @@ function browserMockAssetsPlugin(): Plugin {
         path.join(distAssetsDir, 'asset-index.json'),
         JSON.stringify(buildAssetIndex(assetsDir)),
       );
+
+      // Static demo build (GitHub Pages): ship the pre-decoded sprites too, so
+      // the page loads fast and carpets work without a server.
+      if (process.env.VITE_PIXEL_DEMO === '1') {
+        const decodedDir = path.join(distAssetsDir, 'decoded');
+        fs.mkdirSync(decodedDir, { recursive: true });
+        const write = (name: string, data: unknown) =>
+          fs.writeFileSync(path.join(decodedDir, name), JSON.stringify(data));
+        write('characters.json', decodeAllCharacters(assetsDir));
+        write('floors.json', decodeAllFloors(assetsDir));
+        write('walls.json', decodeAllWalls(assetsDir));
+        write('carpets.json', decodeAllCarpets(assetsDir));
+        write('furniture.json', decodeAllFurniture(assetsDir, catalog));
+      }
     },
   };
 }

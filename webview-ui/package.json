@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:pages": "tsc -b && VITE_PIXEL_DEMO=1 vite build --outDir ../dist/pages",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

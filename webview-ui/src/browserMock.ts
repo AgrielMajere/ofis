@@ -25,6 +25,8 @@ import type {
   CatalogEntry,
   CharacterDirectionSprites,
 } from '../../core/src/assets/types.ts';
+import { isDemo } from './runtime.js';
+import { loadDemoLayout } from './transport/demoTransport.js';
 
 interface MockPayload {
   characters: CharacterDirectionSprites[];
@@ -189,7 +191,7 @@ export async function initBrowserMock(): Promise<void> {
     fetch(`${base}assets/furniture-catalog.json`).then((r) => r.json()) as Promise<CatalogEntry[]>,
   ]);
 
-  const shouldTryDecoded = import.meta.env.DEV;
+  const shouldTryDecoded = import.meta.env.DEV || isDemo;
   const [decodedCharacters, decodedFloors, decodedWalls, decodedFurniture] = shouldTryDecoded
     ? await Promise.all([
         fetchJsonOptional<CharacterDirectionSprites[]>(`${base}assets/decoded/characters.json`),
@@ -218,9 +220,12 @@ export async function initBrowserMock(): Promise<void> {
         decodeFurnitureFromPng(base, catalog),
       ]);
 
-  const layout = assetIndex.defaultLayout
-    ? await fetch(`${base}assets/${assetIndex.defaultLayout}`).then((r) => r.json())
-    : null;
+  const savedLayout = isDemo ? loadDemoLayout() : null;
+  const layout = savedLayout
+    ? savedLayout
+    : assetIndex.defaultLayout
+      ? await fetch(`${base}assets/${assetIndex.defaultLayout}`).then((r) => r.json())
+      : null;
 
   // Carpets only have a decoded-JSON endpoint (no PNG fallback / asset-index
   // entry); empty array is fine — the carpet tab just won't render variants.
@@ -277,6 +282,11 @@ export function dispatchMockMessages(): void {
   dispatch({ type: 'carpetTilesLoaded', sets: carpetSets });
   dispatch({ type: 'furnitureAssetsLoaded', catalog: furnitureCatalog, sprites: furnitureSprites });
   dispatch({ type: 'layoutLoaded', layout });
+  if (isDemo) {
+    // DemoTransport sends the settings (and agents) once the layout lands.
+    console.log('[BrowserMock] Messages dispatched');
+    return;
+  }
   dispatch({
     type: 'settingsLoaded',
     soundEnabled: false,

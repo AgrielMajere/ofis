@@ -16,6 +16,13 @@ const runtime: Runtime = typeof acquireVsCodeApi !== 'undefined' ? 'vscode' : 'b
 export const isBrowserRuntime = runtime === 'browser';
 
 /**
+ * Static demo build (GitHub Pages): `VITE_PIXEL_DEMO=1 vite build`. No server
+ * behind the page — browserMock supplies the assets and DemoTransport plays
+ * the server, with simulated agents.
+ */
+export const isDemo: boolean = isBrowserRuntime && import.meta.env.VITE_PIXEL_DEMO === '1';
+
+/**
  * True only under the Playwright e2e harness, which sets `__PIXEL_AGENTS_E2E`
  * via `addInitScript` before any app code runs (so it's set in every frame,
  * including the VS Code webview iframe). Gates test-only diagnostics

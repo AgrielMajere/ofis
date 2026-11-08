@@ -1,3 +1,5 @@
+> **Веб-версія:** https://agrielmajere.github.io/ofis/ — офіс відкривається просто за посиланням, з демо-агентами (працює на телефоні теж). Розставлене в редакторі зберігається в цьому браузері. Справжні агенти з твоїх терміналів показуються лише через локальний сервер (`npx pixel-agents`) або розширення VS Code.
+
 <h1 align="center">
   <a href="https://github.com/pixel-agents-hq/pixel-agents/discussions">
     <img src="webview-ui/public/banner.png" alt="Pixel Agents">
